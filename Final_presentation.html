@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="NTOU.png" sizes="any" type="image/svg+xml">
+    <title>Final_presentation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@300;400;600;700;800&family=Merriweather:ital,wght@0,300;0,400;0,700;1,400&family=Noto+Sans+TC:wght@400;700&display=swap');
+        
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #1e3a8a;
+            --accent: #f59e0b;
+            --bg-dark: #0f172a;
+            --text-light: #f8fafc;
+        }
+
+        body {
+            font-family: 'Inter', 'Noto Sans TC', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            scroll-behavior: smooth;
+        }
+
+        /* --- Components --- */
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .glass-panel:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .paper-text {
+            font-family: 'Merriweather', serif;
+            line-height: 1.8;
+            color: #cbd5e1;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .paper-section {
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid transparent;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background-color: rgba(30, 41, 59, 0.3);
+        }
+
+        .paper-section:hover { background-color: rgba(59, 130, 246, 0.1); }
+        .paper-section.active {
+            background-color: rgba(59, 130, 246, 0.15);
+            border-left-color: var(--accent);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .highlight {
+            background-color: transparent;
+            color: inherit;
+            padding: 0 2px;
+            border-radius: 2px;
+            transition: all 0.5s ease;
+            font-weight: normal;
+            border-bottom: 1px dotted rgba(255, 255, 255, 0.3);
+        }
+
+        .paper-section.active .highlight {
+            background-color: rgba(245, 158, 11, 0.2);
+            color: #fbbf24;
+            font-weight: bold;
+            box-shadow: 0 0 8px rgba(245, 158, 11, 0.2);
+            border-bottom: none;
+        }
+
+        .pyramid-layer {
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            cursor: pointer;
+            filter: brightness(0.9);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            font-weight: bold;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .pyramid-layer:hover, .pyramid-layer.active {
+            transform: scale(1.05);
+            filter: brightness(1.2);
+            box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.5);
+            z-index: 10;
+        }
+
+        .pyramid-layer.active {
+            border-left: 6px solid var(--accent);
+            background: linear-gradient(90deg, var(--primary-dark), #2563eb);
+        }
+
+        .bg-level-1 { background: linear-gradient(to right, #172554, #1e3a8a); }
+        .bg-level-2 { background: linear-gradient(to right, #1e3a8a, #1d4ed8); }
+        .bg-level-3 { background: linear-gradient(to right, #1d4ed8, #2563eb); }
+        .bg-level-4 { background: linear-gradient(to right, #2563eb, #3b82f6); }
+        .bg-level-5 { background: linear-gradient(to right, #3b82f6, #60a5fa); }
+
+        .animate-content { animation: fadeInSlideUp 0.6s ease-out forwards; }
+        @keyframes fadeInSlideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        
+        #scroll-progress { background: linear-gradient(90deg, var(--primary), var(--accent)); }
+
+        .pivot-arrow { transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55); }
+        .pivot-active .pivot-arrow { transform: rotate(180deg); }
+        
+        /* HOVER INTERACTION FOR CARDS */
+        .challenge-card { 
+            transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+            height: 160px; /* Base Height */
+            overflow: hidden; 
+            position: relative;
+            z-index: 1;
+        }
+        
+        .challenge-card:hover {
+            height: 420px; /* Expanded Height for deeper content */
+            background-color: rgba(30, 41, 59, 0.95);
+            border-color: rgba(255, 255, 255, 0.3);
+            z-index: 10;
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .card-content {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.4s ease 0.1s;
+        }
+
+        .challenge-card:hover .card-content {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .negative-word {
+            color: #ef4444;
+            font-weight: bold;
+            background: rgba(239, 68, 68, 0.1);
+            padding: 0 4px;
+            border-radius: 4px;
+        }
+
+        #presenter-name {
+            cursor: pointer;
+            position: relative;
+            display: inline-block;
+        }
+        
+        #presenter-name::after {
+            
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--accent);
+            color: black;
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        #presenter-name:hover::after { opacity: 1; }
+    </style>
+</head>
+<body class="overflow-x-hidden">
+
+    <div class="fixed top-0 left-0 w-full z-50 h-1.5 bg-slate-800">
+        <div id="scroll-progress" class="h-full w-0 transition-all duration-300"></div>
+    </div>
+
+    <nav class="fixed top-6 left-0 w-full z-40 flex justify-center pointer-events-none">
+        <div class="glass-panel px-6 py-3 rounded-full flex gap-8 pointer-events-auto shadow-2xl">
+            <a href="#hero" class="text-sm font-semibold hover:text-blue-400 transition-colors" data-i18n="nav_intro">Intro</a>
+            <a href="#structure" class="text-sm font-semibold hover:text-blue-400 transition-colors" data-i18n="nav_structure">5-Move Structure</a>
+            <a href="#gap" class="text-sm font-semibold hover:text-blue-400 transition-colors" data-i18n="nav_gap">The Gap</a>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <section id="hero" class="min-h-screen flex flex-col items-center justify-center p-6 relative">
+        <div class="z-10 text-center space-y-8 max-w-5xl animate-content">
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-blue-500/30 bg-blue-500/10 text-blue-400 text-xs font-bold uppercase tracking-widest">
+                <i data-lucide="file-text" size="14"></i>
+                <span data-i18n="hero_tag">Scientific Writing Final Project</span>
+            </div>
+            <h1 class="text-5xl md:text-7xl font-black tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-blue-100 to-slate-400">
+                <span data-i18n="hero_title_1">Introduction</span><br><span data-i18n="hero_title_2">Structure Analysis</span>
+            </h1>
+            <p class="text-xl text-slate-400 max-w-3xl mx-auto font-light leading-relaxed">
+                <span data-i18n="hero_desc_1">Deconstructing the rhetorical moves of</span> <span class="text-white font-medium">MARCA</span> (ICCAD '24) <span data-i18n="hero_desc_2">using the</span> <span class="text-amber-400 font-medium">5-Move Model</span>.
+            </p>
+            <div class="flex flex-col md:flex-row items-center justify-center gap-12 pt-12">
+                <div class="text-left border-l-4 border-blue-500 pl-4 py-1">
+                    <p class="text-slate-500 text-xs uppercase tracking-widest font-bold" data-i18n="presenter_label">Presenter</p>
+                    <p id="presenter-name" class="text-2xl font-bold text-white hover:text-amber-400 transition-colors" onclick="toggleLanguage()">Hong-Jun Lin <i data-lucide="refresh-cw" class="inline w-4 h-4 ml-1 opacity-50"></i></p>
+                    <p class="text-sm text-slate-400 font-mono">ID: 11457006</p>
+                </div>
+                <div class="text-left border-l-4 border-amber-500 pl-4 py-1">
+                    <p class="text-slate-500 text-xs uppercase tracking-widest font-bold" data-i18n="paper_label">Paper Target</p>
+                    <p class="text-xl font-bold text-white">MARCA Accelerator</p>
+                    <p class="text-sm text-slate-400">ICCAD 2024</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 1: Structure -->
+    <section id="structure" class="min-h-screen py-24 px-6 max-w-7xl mx-auto">
+        <div class="text-center mb-16">
+            <h2 class="text-4xl font-bold mb-4" data-i18n="sec1_title">The 5-Move Structural Analysis</h2>
+            <p class="text-slate-400" data-i18n="sec1_desc">Click on the text sections or the pyramid layers to view detailed writing strategies.</p>
+        </div>
+
+        <div class="grid lg:grid-cols-2 gap-12 items-start">
+            <!-- Left: Paper Text -->
+            <div class="space-y-4">
+                <div id="text-1" class="paper-section glass-panel active" onclick="updateLayer(1)">
+                    <span class="text-xs font-bold text-blue-400 mb-2 block uppercase" data-i18n="move1_label">Move 1: Establish Importance</span>
+                    <p class="paper-text">State space model (SSM) especially Mamba has demonstrated <span class="highlight">remarkable capabilities</span> in various domains including language, images, audio, and genomics.</p>
+                </div>
+                <div id="text-2" class="paper-section glass-panel" onclick="updateLayer(2)">
+                    <span class="text-xs font-bold text-blue-400 mb-2 block uppercase" data-i18n="move2_label">Move 2: Previous/Current Research</span>
+                    <p class="paper-text">Before Mamba, Transformer-based large language models have achieved <span class="highlight">great success</span>... <span class="highlight">However</span>, it suffers from quadratic growth... <span class="highlight">Compared with</span> the pioneers... Mamba achieves higher accuracy... <span class="highlight">Therefore</span>, Mamba, as a <span class="highlight">foundation model</span>, has been applied in various domains.</p>
+                </div>
+                <div id="text-3" class="paper-section glass-panel" onclick="updateLayer(3)">
+                    <span class="text-xs font-bold text-blue-400 mb-2 block uppercase" data-i18n="move3_label">Move 3: The Gap / Problem</span>
+                    <p class="paper-text"><span class="highlight">However</span>, there is <span class="highlight">limited research</span> on optimizing for Mamba processing. <span class="highlight">Therefore</span>, we profile... and identify three main challenges: (1) <span class="highlight">Incompatibility</span>... (2) Large area overhead... (3) Large memory access... it is <span class="highlight">useless</span> to apply the existed methods.</p>
+                </div>
+                <div id="text-4" class="paper-section glass-panel" onclick="updateLayer(4)">
+                    <span class="text-xs font-bold text-blue-400 mb-2 block uppercase" data-i18n="move4_label">Move 4: The Present Work</span>
+                    <p class="paper-text"><span class="highlight">In response to</span> these challenges, we <span class="highlight">propose</span> MARCA... to support fast and energy-efficient Mamba computations.</p>
+                </div>
+                <div id="text-5" class="paper-section glass-panel" onclick="updateLayer(5)">
+                    <span class="text-xs font-bold text-blue-400 mb-2 block uppercase" data-i18n="move5_label">Move 5: Results & Contributions</span>
+                    <p class="paper-text">Our contributions are as follows... As a result, MARCA achieves up to <span class="highlight">463.22× speedup</span> and <span class="highlight">9761.42× energy efficiency</span> compared to Intel Xeon CPU...</p>
+                </div>
+            </div>
+
+            <!-- Right: Analysis Panel -->
+            <div class="sticky top-28 space-y-6">
+                <div id="analysis-card" class="glass-panel p-8 rounded-3xl min-h-[320px] flex flex-col justify-center transition-all duration-300 border-t-4 border-t-blue-500 bg-slate-900/80">
+                    <div class="flex items-center gap-3 mb-6">
+                        <span id="layer-badge" class="bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Move 1</span>
+                        <h3 id="layer-title" class="text-2xl font-bold text-white">Establish Importance</h3>
+                    </div>
+                    <div class="space-y-4">
+                        <div>
+                            <h4 class="text-xs font-bold text-blue-400 uppercase mb-1 flex items-center gap-2" data-i18n="card_function"><i data-lucide="pen-tool" size="14"></i> Rhetorical Function</h4>
+                            <p id="layer-desc" class="text-slate-300 text-base leading-relaxed">The authors first establish the dominance of SSM/Mamba in the AI field.</p>
+                        </div>
+                        <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700">
+                            <h4 class="text-xs text-amber-400 uppercase font-bold mb-2 flex items-center gap-2" data-i18n="card_strategy"><i data-lucide="search" size="14"></i> Writing Strategy</h4>
+                            <p id="layer-analysis" class="text-slate-300 text-sm leading-relaxed">Using positive evaluative adjectives like <span class="text-amber-400 font-bold">remarkable capabilities</span>.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex flex-col items-center w-full">
+                    <div id="level-1" class="pyramid-layer active w-full h-14 mb-1 rounded-t-lg bg-level-1" onclick="updateLayer(1)" data-i18n="pyr_1">1. Establish Importance</div>
+                    <div id="level-2" class="pyramid-layer w-[90%] h-14 mb-1 bg-level-2" onclick="updateLayer(2)" data-i18n="pyr_2">2. Previous/Current Research</div>
+                    <div id="level-3" class="pyramid-layer w-[80%] h-14 mb-1 bg-level-3" onclick="updateLayer(3)" data-i18n="pyr_3">3. The Gap / Problem</div>
+                    <div id="level-4" class="pyramid-layer w-[70%] h-14 mb-1 bg-level-4" onclick="updateLayer(4)" data-i18n="pyr_4">4. The Present Work</div>
+                    <div id="level-5" class="pyramid-layer w-[60%] h-14 rounded-b-lg bg-level-5" onclick="updateLayer(5)" data-i18n="pyr_5">5. Contributions & Results</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 2: Gap Analysis (Hover) -->
+    <section id="gap" class="py-24 bg-slate-900/80 relative overflow-hidden">
+        <div class="absolute -right-20 top-40 w-96 h-96 bg-red-600/10 rounded-full blur-[100px] pointer-events-none"></div>
+
+        <div class="max-w-6xl mx-auto px-6 relative z-10">
+            <div class="text-center mb-16">
+                <span class="text-amber-500 font-bold tracking-widest text-sm uppercase mb-2 block" data-i18n="gap_subtitle">Deep Dive: Move 3</span>
+                <h2 class="text-4xl md:text-5xl font-black mb-6" data-i18n="gap_title">Defining the Gap: The Pivot</h2>
+                <p class="text-slate-400 max-w-2xl mx-auto text-lg" data-i18n="gap_desc">This is the pivotal moment. Click "However" to see the shift. Hover over cards for details.</p>
+            </div>
+
+            <!-- Pivot Button -->
+            <div class="flex justify-center mb-20">
+                <button onclick="togglePivot()" id="pivot-btn" class="group relative inline-flex items-center gap-3 px-8 py-4 bg-slate-800 hover:bg-slate-700 rounded-full border border-slate-600 transition-all duration-500 hover:scale-105 shadow-2xl">
+                    <span id="pivot-text-left" class="font-bold text-green-400 transition-opacity duration-300" data-i18n="pivot_good">Mamba is Great</span>
+                    <div class="w-10 h-10 bg-amber-500 rounded-full flex items-center justify-center pivot-arrow shadow-lg group-hover:rotate-180 transition-transform duration-500">
+                        <i data-lucide="arrow-right-left" class="text-slate-900"></i>
+                    </div>
+                    <span id="pivot-text-right" class="font-bold text-slate-500 transition-opacity duration-300" data-i18n="pivot_bad">However...</span>
+                </button>
+            </div>
+
+            <div id="pivot-result" class="hidden text-center mb-16 animate-content bg-red-900/20 p-6 rounded-2xl border border-red-500/30">
+                <p class="text-xl text-red-200 font-bold mb-2" data-i18n="pivot_res_title">"Hardware research is limited"</p>
+                <p class="text-slate-400 text-sm" data-i18n="pivot_res_desc">Through "However," the author shifts focus to specific challenges.</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-6">
+                <!-- Challenge 1 -->
+                <div class="glass-panel p-6 rounded-2xl border-t-4 border-t-red-500 challenge-card group">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="bg-red-500/10 p-3 rounded-xl text-red-500"><i data-lucide="cpu" size="24"></i></div>
+                        <span class="text-xs font-bold text-slate-500 uppercase">Challenge 01</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-2" data-i18n="c1_title">Incompatibility</h3>
+                    <p class="text-sm text-red-300 font-mono mb-4" data-i18n="c1_sub">Element-wise ops vs. Tensor Core</p>
+                    
+                    <div class="card-content">
+                        <div class="space-y-4 border-t border-slate-700 pt-4">
+                            <div>
+                                <p class="text-xs text-slate-500 font-bold uppercase mb-1">The Conflict</p>
+                                <p class="text-sm text-slate-300" data-i18n="c1_conflict">Tensor Cores are built for reduction. Mamba's element-wise ops don't need reduction, leading to massive inefficiency.</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-slate-500 font-bold uppercase mb-1">Evidence</p>
+                                <p class="paper-text text-sm italic text-red-200 mb-1">"...1/16 normalized speed."</p>
+                            </div>
+                            <div class="bg-slate-800 p-2 rounded">
+                                <p class="text-xs text-blue-400" data-i18n="c1_strat">Strategy: Using numbers to prove inefficiency.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="absolute bottom-4 right-4 text-xs text-blue-400 opacity-100 group-hover:opacity-0 transition-opacity" data-i18n="hover_expand">Hover to Expand</div>
+                </div>
+
+                <!-- Challenge 2 -->
+                <div class="glass-panel p-6 rounded-2xl border-t-4 border-t-amber-500 challenge-card group">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="bg-amber-500/10 p-3 rounded-xl text-amber-500"><i data-lucide="layers" size="24"></i></div>
+                        <span class="text-xs font-bold text-slate-500 uppercase">Challenge 02</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-2" data-i18n="c2_title">Area Overhead</h3>
+                    <p class="text-sm text-amber-300 font-mono mb-4" data-i18n="c2_sub">Wasted silicon area</p>
+                    
+                    <div class="card-content">
+                        <div class="space-y-4 border-t border-slate-700 pt-4">
+                            <div>
+                                <p class="text-xs text-slate-500 font-bold uppercase mb-1">The Conflict</p>
+                                <p class="text-sm text-slate-300" data-i18n="c2_conflict">Specialized units for nonlinear functions (like Exp) occupy too much space but are not always used.</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-slate-500 font-bold uppercase mb-1">Evidence</p>
+                                <p class="paper-text text-sm italic text-amber-200 mb-1">"...occupies >30% of the PE area."</p>
+                            </div>
+                            <div class="bg-slate-800 p-2 rounded">
+                                <p class="text-xs text-blue-400" data-i18n="c2_strat">Strategy: Criticizing resource waste.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="absolute bottom-4 right-4 text-xs text-blue-400 opacity-100 group-hover:opacity-0 transition-opacity" data-i18n="hover_expand">Hover to Expand</div>
+                </div>
+
+                <!-- Challenge 3 -->
+                <div class="glass-panel p-6 rounded-2xl border-t-4 border-t-purple-500 challenge-card group">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="bg-purple-500/10 p-3 rounded-xl text-purple-500"><i data-lucide="database" size="24"></i></div>
+                        <span class="text-xs font-bold text-slate-500 uppercase">Challenge 03</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-2" data-i18n="c3_title">Memory Bottleneck</h3>
+                    <p class="text-sm text-purple-300 font-mono mb-4" data-i18n="c3_sub">Existing methods fail</p>
+                    
+                    <div class="card-content">
+                        <div class="space-y-4 border-t border-slate-700 pt-4">
+                            <div>
+                                <p class="text-xs text-slate-500 font-bold uppercase mb-1">The Conflict</p>
+                                <p class="text-sm text-slate-300" data-i18n="c3_conflict">High memory access but limited data reuse makes traditional 'Tiling' optimization impossible.</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-slate-500 font-bold uppercase mb-1">Evidence</p>
+                                <p class="paper-text text-sm italic text-purple-200 mb-1">"...it is <span class="negative-word">useless</span> to apply existed methods."</p>
+                            </div>
+                            <div class="bg-slate-800 p-2 rounded">
+                                <p class="text-xs text-blue-400" data-i18n="c3_strat">Strategy: Using the strong word "Useless".</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="absolute bottom-4 right-4 text-xs text-blue-400 opacity-100 group-hover:opacity-0 transition-opacity" data-i18n="hover_expand">Hover to Expand</div>
+                </div>
+            </div>
+
+            <div class="mt-16 p-6 bg-slate-800 rounded-xl border border-slate-700 flex items-start gap-4">
+                <div class="p-3 bg-blue-500/20 rounded-full text-blue-400"><i data-lucide="pen-tool" size="20"></i></div>
+                <div>
+                    <h4 class="text-lg font-bold text-white mb-2" data-i18n="strat_sum_title">Strategy Summary: Move 3</h4>
+                    <p class="text-slate-400 text-sm leading-relaxed" data-i18n="strat_sum_desc">
+                        The author goes beyond simply stating problems. They use <strong class="text-red-400">Negative Evaluation</strong> words like "Incompatibility" and "Useless" to intensify the tone. In academic writing, this is called <strong class="text-amber-400">Problematization</strong>, aiming to create an indispensable need for the proposed solution.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="py-12 text-center text-slate-600 text-sm border-t border-slate-900 bg-slate-950">
+        <p class="font-semibold text-slate-500" data-i18n="footer">Scientific Writing Final Project Analysis</p>
+        <p class="mt-2">Hong-Jun Lin (11457006) | NTOU</p>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+        window.onscroll = function() {
+            let winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            let height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            let scrolled = (winScroll / height) * 100;
+            document.getElementById("scroll-progress").style.width = scrolled + "%";
+        };
+
+        const i18n = {
+            en: {
+                nav_intro: "Intro", nav_structure: "Structure", nav_gap: "The Gap",
+                hero_tag: "Scientific Writing Final Project",
+                hero_title_1: "Introduction", hero_title_2: "Structure Analysis",
+                hero_desc_1: "Deconstructing the rhetorical moves of", hero_desc_2: "using the",
+                presenter_label: "Presenter", paper_label: "Paper Target",
+                sec1_title: "The 5-Move Structural Analysis", sec1_desc: "Click on the text sections or the pyramid layers to view detailed writing strategies.",
+                move1_label: "Move 1: Establish Importance", move2_label: "Move 2: Previous/Current Research",
+                move3_label: "Move 3: The Gap / Problem", move4_label: "Move 4: The Present Work", move5_label: "Move 5: Results & Contributions",
+                card_function: "Rhetorical Function", card_strategy: "Writing Strategy",
+                pyr_1: "1. Establish Importance", pyr_2: "2. Previous/Current Research", pyr_3: "3. The Gap / Problem",
+                pyr_4: "4. The Present Work", pyr_5: "5. Contributions & Results",
+                gap_subtitle: "Deep Dive: Move 3", gap_title: "Defining the Gap: The Pivot",
+                gap_desc: "This is the pivotal moment. Click the 'However' button to see the perspective shift. Hover over cards for details.",
+                pivot_good: "Mamba is Great", pivot_bad: "However...",
+                pivot_res_title: "\"Hardware research is limited\"", pivot_res_desc: "Through 'However,' the author shifts focus to specific challenges.",
+                c1_title: "Incompatibility", c1_sub: "Element-wise ops vs. Tensor Core",
+                c1_conflict: "Tensor Cores are built for reduction. Mamba's element-wise ops don't need reduction, leading to massive inefficiency.",
+                c1_strat: "Strategy: Using numbers to prove inefficiency.",
+                c2_title: "Area Overhead", c2_sub: "Wasted silicon area",
+                c2_conflict: "Specialized units for nonlinear functions (like Exp) occupy too much space but are not always used.",
+                c2_strat: "Strategy: Criticizing resource waste (Overhead).",
+                c3_title: "Memory Bottleneck", c3_sub: "Existing methods fail",
+                c3_conflict: "High memory access but limited data reuse makes traditional 'Tiling' optimization impossible.",
+                c3_strat: "Strategy: Using the strong word 'Useless'.",
+                evidence_label: "Evidence", hover_expand: "Hover to Expand",
+                strat_sum_title: "Strategy Summary: Move 3",
+                strat_sum_desc: "The author goes beyond simply stating problems. They use <strong class='text-red-400'>Negative Evaluation</strong> words like \"Incompatibility\" and \"Useless\" to intensify the tone. In academic writing, this is called <strong class='text-amber-400'>Problematization</strong>, aiming to create an indispensable need for the proposed solution.",
+                footer: "Scientific Writing Final Project Analysis"
+            },
+            zh: {
+                nav_intro: "簡介", nav_structure: "結構分析", nav_gap: "定義缺口",
+                hero_tag: "科技論文寫作 期末報告",
+                hero_title_1: "緒論結構", hero_title_2: "深度解析",
+                hero_desc_1: "解構", hero_desc_2: "的修辭策略，運用",
+                presenter_label: "報告人", paper_label: "分析對象",
+                sec1_title: "Introduction 五步結構解析", sec1_desc: "點擊左側原文段落或右側金字塔，查看詳細的寫作策略分析。",
+                move1_label: "Move 1: 建立重要性", move2_label: "Move 2: 過往研究與比較",
+                move3_label: "Move 3: 定義缺口 / 問題", move4_label: "Move 4: 提出解法 (MARCA)", move5_label: "Move 5: 貢獻與結果",
+                card_function: "寫作功能", card_strategy: "關鍵字與策略",
+                pyr_1: "1. 建立重要性", pyr_2: "2. 過往研究與比較", pyr_3: "3. 定義缺口 (Gap)",
+                pyr_4: "4. 提出解法 (Work)", pyr_5: "5. 貢獻與結果",
+                gap_subtitle: "深入剖析 Move 3", gap_title: "定義研究缺口：從讚美到批評",
+                gap_desc: "這是整篇文章的轉折樞紐。點擊下方的 'However' 按鈕，體驗作者如何引導讀者的思維轉變。滑鼠懸浮卡片查看細節。",
+                pivot_good: "Mamba 演算法很棒", pivot_bad: "但是 (However)...",
+                pivot_res_title: "\"硬體研究非常有限 (Limited Research)\"", pivot_res_desc: "透過 However，作者成功將焦點轉移至三個具體的工程挑戰。",
+                c1_title: "不相容性", c1_sub: "Element-wise 操作與 Tensor Core 不合",
+                c1_conflict: "Tensor Core 專為 Reduction 設計。Mamba 的逐元素操作不需要 Reduction，導致巨大的效率低落。",
+                c1_strat: "寫作策略：用具體數字證明現有架構的無能。",
+                c2_title: "面積開銷", c2_sub: "非線性單元浪費資源",
+                c2_conflict: "專用的非線性運算單元（如 Exp）佔用太多空間，但卻不常被使用。",
+                c2_strat: "寫作策略：批評資源浪費 (Overhead) 以合理化新設計。",
+                c3_title: "記憶體瓶頸", c3_sub: "現有方法無效",
+                c3_conflict: "記憶體存取量大，但數據重複使用率低，使得傳統的 'Tiling' 優化技術完全失效。",
+                c3_strat: "寫作策略：使用 \"Useless\" 強烈字眼，斷絕使用舊方法的可能性。",
+                evidence_label: "原文證據", hover_expand: "懸浮展開",
+                strat_sum_title: "Move 3 寫作策略總結",
+                strat_sum_desc: "作者不只陳述問題，而是使用 <strong class='text-red-400'>負面評價詞 (Negative Evaluation)</strong> 如 \"Incompatibility\" 和 \"Useless\" 來強化語氣。這在學術寫作中稱為 <strong class='text-amber-400'>問題化 (Problematization)</strong>，目的是為了替接下來提出的解決方案創造不可或缺的需求。",
+                footer: "科技論文寫作分析報告"
+            }
+        };
+
+        const layerData = {
+            1: {
+                en: { title: "Establish Importance (Move 1)", desc: "The authors first establish the dominance of SSM/Mamba in the AI field.", analysis: "Using positive evaluative adjectives like <span class='text-amber-400 font-bold'>remarkable capabilities</span>. This is a Rhetorical Strategy to immediately validate the research topic's value." },
+                zh: { title: "建立重要性 (Move 1)", desc: "作者首先確立 SSM/Mamba 在 AI 領域的統治地位。", analysis: "使用 <span class='text-amber-400 font-bold'>remarkable capabilities</span> (卓越能力) 這類正面的評價形容詞，立即讓讀者認同此研究主題的價值。" }
+            },
+            2: {
+                en: { title: "Previous Research (Move 2)", desc: "Establishing a comparison. Acknowledging Transformer's success, then pointing out its flaw.", analysis: "Using the <span class='text-amber-400 font-bold'>Compared with</span> phrase to provide 'Background Facts' (Mamba has higher accuracy), laying the groundwork for hardware optimization." },
+                zh: { title: "過往研究與比較 (Move 2)", desc: "建立對照組。先承認 Transformer 的成功，再指出其缺點。", analysis: "使用 <span class='text-amber-400 font-bold'>Compared with</span> 句型。提供背景事實（Mamba 準確度更高），為後續推銷硬體加速器奠定基礎。" }
+            },
+            3: {
+                en: { title: "The Gap / Problem (Move 3)", desc: "The critical pivot. Pointing out the lack of hardware research (<span class='text-amber-400 font-bold'>limited research</span>).", analysis: "The author doesn't just say 'no one did it,' but lists 3 specific challenges. Using strong negative words like <span class='text-amber-400 font-bold'>useless</span> creates urgency." },
+                zh: { title: "定義缺口 (Move 3)", desc: "這是關鍵轉折。指出硬體研究的空白 (<span class='text-amber-400 font-bold'>limited research</span>)。", analysis: "作者不只說『沒人做』，更具體列出三大挑戰。使用強烈負面詞彙如 <span class='text-amber-400 font-bold'>useless</span> (無效)，營造出『非解決不可』的迫切感。" }
+            },
+            4: {
+                en: { title: "The Present Work (Move 4)", desc: "Formally introducing MARCA. Using <span class='text-amber-400 font-bold'>In response to</span> links solution to challenges.", analysis: "Using the standard verb <span class='text-amber-400 font-bold'>propose</span>. This part is symmetrical: for every problem in Move 3, there is a corresponding technical strategy." },
+                zh: { title: "提出解法 (Move 4)", desc: "正式介紹 MARCA。使用 <span class='text-amber-400 font-bold'>In response to</span> 將解法直接連結到前述挑戰。", analysis: "使用標準動詞 <span class='text-amber-400 font-bold'>propose</span>。這部分的結構是對稱的：Move 3 有幾個問題，這裡就有幾個對應的技術策略。" }
+            },
+            5: {
+                en: { title: "Contributions (Move 5)", desc: "Listing contributions and previewing experimental results.", analysis: "Dropping shocking data directly: <span class='text-amber-400 font-bold'>463.22x speedup</span>. This is a powerful Hook, telling the reader this is a major leap." },
+                zh: { title: "貢獻與結果 (Move 5)", desc: "以條列式呈現具體貢獻，並預告實驗結果。", analysis: "直接拋出震撼數據：<span class='text-amber-400 font-bold'>463.22x speedup</span>。這是一個強力的 Hook，告訴讀者這篇論文是巨大的躍進。" }
+            }
+        };
+
+        let currentLang = 'en';
+        let activeLayerId = 1;
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'en' ? 'zh' : 'en';
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (i18n[currentLang][key]) el.innerHTML = i18n[currentLang][key];
+            });
+            updateLayer(activeLayerId);
+            document.getElementById('presenter-name').innerHTML = currentLang === 'en' 
+                ? 'Hong-Jun Lin <i data-lucide="refresh-cw" class="inline w-4 h-4 ml-1 opacity-50"></i>' 
+                : '林竑均 <i data-lucide="refresh-cw" class="inline w-4 h-4 ml-1 opacity-50"></i>';
+            lucide.createIcons();
+        }
+
+        function updateLayer(id) {
+            activeLayerId = id;
+            document.querySelectorAll('.paper-section').forEach(el => el.classList.remove('active'));
+            document.getElementById(`text-${id}`).classList.add('active');
+            document.querySelectorAll('.pyramid-layer').forEach(el => el.classList.remove('active'));
+            document.getElementById(`level-${id}`).classList.add('active');
+            const panel = document.getElementById('analysis-card');
+            panel.style.opacity = 0;
+            setTimeout(() => {
+                const data = layerData[id][currentLang];
+                document.getElementById('layer-title').textContent = data.title;
+                document.getElementById('layer-badge').textContent = `Move ${id}`;
+                document.getElementById('layer-desc').innerHTML = data.desc;
+                document.getElementById('layer-analysis').innerHTML = data.analysis;
+                panel.style.opacity = 1;
+            }, 200);
+        }
+
+        function togglePivot() {
+            const btn = document.getElementById('pivot-btn');
+            const leftText = document.getElementById('pivot-text-left');
+            const rightText = document.getElementById('pivot-text-right');
+            const result = document.getElementById('pivot-result');
+            btn.classList.toggle('pivot-active');
+            if (btn.classList.contains('pivot-active')) {
+                leftText.classList.add('opacity-30');
+                rightText.classList.remove('text-slate-500');
+                rightText.classList.add('text-red-400', 'scale-110');
+                result.classList.remove('hidden');
+            } else {
+                leftText.classList.remove('opacity-30');
+                rightText.classList.remove('text-red-400', 'scale-110');
+                rightText.classList.add('text-slate-500');
+                result.classList.add('hidden');
+            }
+        }
+
+        updateLayer(1);
+    </script>
+</body>
+</html>
