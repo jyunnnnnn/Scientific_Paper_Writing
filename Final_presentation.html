@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="NTOU.png" sizes="any" type="image/svg+xml">
-    <title>Final_presentation</title>
+    <title>Final_presentation - MARCA Analysis</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
@@ -123,17 +123,16 @@
         .pivot-arrow { transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55); }
         .pivot-active .pivot-arrow { transform: rotate(180deg); }
         
-        /* HOVER INTERACTION FOR CARDS */
         .challenge-card { 
             transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
-            height: 160px; /* Base Height */
+            height: 160px;
             overflow: hidden; 
             position: relative;
             z-index: 1;
         }
         
         .challenge-card:hover {
-            height: 420px; /* Expanded Height for deeper content */
+            height: 420px;
             background-color: rgba(30, 41, 59, 0.95);
             border-color: rgba(255, 255, 255, 0.3);
             z-index: 10;
@@ -165,28 +164,31 @@
             position: relative;
             display: inline-block;
         }
-        
-        #presenter-name::after {
-            
-            position: absolute;
-            top: -30px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--accent);
-            color: black;
-            font-size: 0.7rem;
-            padding: 2px 6px;
-            border-radius: 4px;
-            opacity: 0;
-            transition: opacity 0.3s;
+
+        #fireworks-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             pointer-events: none;
-            white-space: nowrap;
+            z-index: 100;
         }
 
-        #presenter-name:hover::after { opacity: 1; }
+        .btn-celebrate {
+            background: linear-gradient(135deg, #f59e0b, #ef4444);
+            box-shadow: 0 0 20px rgba(245, 158, 11, 0.4);
+            transition: all 0.3s ease;
+        }
+        .btn-celebrate:hover {
+            transform: scale(1.1) rotate(2deg);
+            box-shadow: 0 0 30px rgba(245, 158, 11, 0.6);
+        }
     </style>
 </head>
 <body class="overflow-x-hidden">
+
+    <canvas id="fireworks-canvas"></canvas>
 
     <div class="fixed top-0 left-0 w-full z-50 h-1.5 bg-slate-800">
         <div id="scroll-progress" class="h-full w-0 transition-all duration-300"></div>
@@ -195,7 +197,7 @@
     <nav class="fixed top-6 left-0 w-full z-40 flex justify-center pointer-events-none">
         <div class="glass-panel px-6 py-3 rounded-full flex gap-8 pointer-events-auto shadow-2xl">
             <a href="#hero" class="text-sm font-semibold hover:text-blue-400 transition-colors" data-i18n="nav_intro">Intro</a>
-            <a href="#structure" class="text-sm font-semibold hover:text-blue-400 transition-colors" data-i18n="nav_structure">5-Move Structure</a>
+            <a href="#structure" class="text-sm font-semibold hover:text-blue-400 transition-colors" data-i18n="nav_structure">Structure</a>
             <a href="#gap" class="text-sm font-semibold hover:text-blue-400 transition-colors" data-i18n="nav_gap">The Gap</a>
         </div>
     </nav>
@@ -236,7 +238,6 @@
         </div>
 
         <div class="grid lg:grid-cols-2 gap-12 items-start">
-            <!-- Left: Paper Text -->
             <div class="space-y-4">
                 <div id="text-1" class="paper-section glass-panel active" onclick="updateLayer(1)">
                     <span class="text-xs font-bold text-blue-400 mb-2 block uppercase" data-i18n="move1_label">Move 1: Establish Importance</span>
@@ -260,7 +261,6 @@
                 </div>
             </div>
 
-            <!-- Right: Analysis Panel -->
             <div class="sticky top-28 space-y-6">
                 <div id="analysis-card" class="glass-panel p-8 rounded-3xl min-h-[320px] flex flex-col justify-center transition-all duration-300 border-t-4 border-t-blue-500 bg-slate-900/80">
                     <div class="flex items-center gap-3 mb-6">
@@ -290,7 +290,7 @@
         </div>
     </section>
 
-    <!-- Section 2: Gap Analysis (Hover) -->
+    <!-- Section 2: Gap Analysis -->
     <section id="gap" class="py-24 bg-slate-900/80 relative overflow-hidden">
         <div class="absolute -right-20 top-40 w-96 h-96 bg-red-600/10 rounded-full blur-[100px] pointer-events-none"></div>
 
@@ -301,7 +301,6 @@
                 <p class="text-slate-400 max-w-2xl mx-auto text-lg" data-i18n="gap_desc">This is the pivotal moment. Click "However" to see the shift. Hover over cards for details.</p>
             </div>
 
-            <!-- Pivot Button -->
             <div class="flex justify-center mb-20">
                 <button onclick="togglePivot()" id="pivot-btn" class="group relative inline-flex items-center gap-3 px-8 py-4 bg-slate-800 hover:bg-slate-700 rounded-full border border-slate-600 transition-all duration-500 hover:scale-105 shadow-2xl">
                     <span id="pivot-text-left" class="font-bold text-green-400 transition-opacity duration-300" data-i18n="pivot_good">Mamba is Great</span>
@@ -326,23 +325,14 @@
                     </div>
                     <h3 class="text-xl font-bold text-white mb-2" data-i18n="c1_title">Incompatibility</h3>
                     <p class="text-sm text-red-300 font-mono mb-4" data-i18n="c1_sub">Element-wise ops vs. Tensor Core</p>
-                    
                     <div class="card-content">
                         <div class="space-y-4 border-t border-slate-700 pt-4">
-                            <div>
-                                <p class="text-xs text-slate-500 font-bold uppercase mb-1">The Conflict</p>
-                                <p class="text-sm text-slate-300" data-i18n="c1_conflict">Tensor Cores are built for reduction. Mamba's element-wise ops don't need reduction, leading to massive inefficiency.</p>
-                            </div>
-                            <div>
-                                <p class="text-xs text-slate-500 font-bold uppercase mb-1">Evidence</p>
-                                <p class="paper-text text-sm italic text-red-200 mb-1">"...1/16 normalized speed."</p>
-                            </div>
+                            <p class="text-sm text-slate-300" data-i18n="c1_conflict">Tensor Cores are built for reduction. Mamba's element-wise ops don't need reduction, leading to massive inefficiency.</p>
                             <div class="bg-slate-800 p-2 rounded">
                                 <p class="text-xs text-blue-400" data-i18n="c1_strat">Strategy: Using numbers to prove inefficiency.</p>
                             </div>
                         </div>
                     </div>
-                    <div class="absolute bottom-4 right-4 text-xs text-blue-400 opacity-100 group-hover:opacity-0 transition-opacity" data-i18n="hover_expand">Hover to Expand</div>
                 </div>
 
                 <!-- Challenge 2 -->
@@ -353,23 +343,14 @@
                     </div>
                     <h3 class="text-xl font-bold text-white mb-2" data-i18n="c2_title">Area Overhead</h3>
                     <p class="text-sm text-amber-300 font-mono mb-4" data-i18n="c2_sub">Wasted silicon area</p>
-                    
                     <div class="card-content">
                         <div class="space-y-4 border-t border-slate-700 pt-4">
-                            <div>
-                                <p class="text-xs text-slate-500 font-bold uppercase mb-1">The Conflict</p>
-                                <p class="text-sm text-slate-300" data-i18n="c2_conflict">Specialized units for nonlinear functions (like Exp) occupy too much space but are not always used.</p>
-                            </div>
-                            <div>
-                                <p class="text-xs text-slate-500 font-bold uppercase mb-1">Evidence</p>
-                                <p class="paper-text text-sm italic text-amber-200 mb-1">"...occupies >30% of the PE area."</p>
-                            </div>
+                            <p class="text-sm text-slate-300" data-i18n="c2_conflict">Specialized units for nonlinear functions (like Exp) occupy too much space but are not always used.</p>
                             <div class="bg-slate-800 p-2 rounded">
                                 <p class="text-xs text-blue-400" data-i18n="c2_strat">Strategy: Criticizing resource waste.</p>
                             </div>
                         </div>
                     </div>
-                    <div class="absolute bottom-4 right-4 text-xs text-blue-400 opacity-100 group-hover:opacity-0 transition-opacity" data-i18n="hover_expand">Hover to Expand</div>
                 </div>
 
                 <!-- Challenge 3 -->
@@ -380,34 +361,34 @@
                     </div>
                     <h3 class="text-xl font-bold text-white mb-2" data-i18n="c3_title">Memory Bottleneck</h3>
                     <p class="text-sm text-purple-300 font-mono mb-4" data-i18n="c3_sub">Existing methods fail</p>
-                    
                     <div class="card-content">
                         <div class="space-y-4 border-t border-slate-700 pt-4">
-                            <div>
-                                <p class="text-xs text-slate-500 font-bold uppercase mb-1">The Conflict</p>
-                                <p class="text-sm text-slate-300" data-i18n="c3_conflict">High memory access but limited data reuse makes traditional 'Tiling' optimization impossible.</p>
-                            </div>
-                            <div>
-                                <p class="text-xs text-slate-500 font-bold uppercase mb-1">Evidence</p>
-                                <p class="paper-text text-sm italic text-purple-200 mb-1">"...it is <span class="negative-word">useless</span> to apply existed methods."</p>
-                            </div>
+                            <p class="text-sm text-slate-300" data-i18n="c3_conflict">High memory access but limited data reuse makes traditional 'Tiling' optimization impossible.</p>
                             <div class="bg-slate-800 p-2 rounded">
-                                <p class="text-xs text-blue-400" data-i18n="c3_strat">Strategy: Using the strong word "Useless".</p>
+                                <p class="text-xs text-blue-400" data-i18n="c3_strat">Strategy: Using the strong word 'Useless'.</p>
                             </div>
                         </div>
                     </div>
-                    <div class="absolute bottom-4 right-4 text-xs text-blue-400 opacity-100 group-hover:opacity-0 transition-opacity" data-i18n="hover_expand">Hover to Expand</div>
                 </div>
             </div>
+        </div>
+    </section>
 
-            <div class="mt-16 p-6 bg-slate-800 rounded-xl border border-slate-700 flex items-start gap-4">
-                <div class="p-3 bg-blue-500/20 rounded-full text-blue-400"><i data-lucide="pen-tool" size="20"></i></div>
-                <div>
-                    <h4 class="text-lg font-bold text-white mb-2" data-i18n="strat_sum_title">Strategy Summary: Move 3</h4>
-                    <p class="text-slate-400 text-sm leading-relaxed" data-i18n="strat_sum_desc">
-                        The author goes beyond simply stating problems. They use <strong class="text-red-400">Negative Evaluation</strong> words like "Incompatibility" and "Useless" to intensify the tone. In academic writing, this is called <strong class="text-amber-400">Problematization</strong>, aiming to create an indispensable need for the proposed solution.
-                    </p>
-                </div>
+    <!-- NEW: Thank You Section -->
+    <section id="thanks" class="py-32 flex flex-col items-center justify-center text-center px-6 relative">
+        <div class="absolute inset-0 bg-gradient-to-b from-transparent to-blue-900/20 pointer-events-none"></div>
+        <div class="z-10 space-y-8 animate-content">
+            <h2 class="text-6xl md:text-8xl font-black tracking-tighter text-white" data-i18n="thank_you_title">
+                Thank You!
+            </h2>
+            <p class="text-xl text-slate-400 font-light max-w-lg mx-auto" data-i18n="thank_you_desc">
+                Thank you for your attention. Feel free to ask any questions!
+            </p>
+            <div class="pt-6">
+                <button onclick="launchFireworks()" class="btn-celebrate px-10 py-5 rounded-full text-black font-black text-xl flex items-center gap-3 mx-auto uppercase tracking-widest">
+                    <i data-lucide="sparkles"></i>
+                    <span data-i18n="celebrate_btn">Celebrate!</span>
+                </button>
             </div>
         </div>
     </section>
@@ -419,6 +400,8 @@
 
     <script>
         lucide.createIcons();
+        
+        // Progress Bar
         window.onscroll = function() {
             let winScroll = document.body.scrollTop || document.documentElement.scrollTop;
             let height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
@@ -433,29 +416,29 @@
                 hero_title_1: "Introduction", hero_title_2: "Structure Analysis",
                 hero_desc_1: "Deconstructing the rhetorical moves of", hero_desc_2: "using the",
                 presenter_label: "Presenter", paper_label: "Paper Target",
-                sec1_title: "The 5-Move Structural Analysis", sec1_desc: "Click on the text sections or the pyramid layers to view detailed writing strategies.",
+                sec1_title: "The 5-Move Structural Analysis", sec1_desc: "Click on text or pyramid layers to view detailed writing strategies.",
                 move1_label: "Move 1: Establish Importance", move2_label: "Move 2: Previous/Current Research",
                 move3_label: "Move 3: The Gap / Problem", move4_label: "Move 4: The Present Work", move5_label: "Move 5: Results & Contributions",
                 card_function: "Rhetorical Function", card_strategy: "Writing Strategy",
                 pyr_1: "1. Establish Importance", pyr_2: "2. Previous/Current Research", pyr_3: "3. The Gap / Problem",
                 pyr_4: "4. The Present Work", pyr_5: "5. Contributions & Results",
                 gap_subtitle: "Deep Dive: Move 3", gap_title: "Defining the Gap: The Pivot",
-                gap_desc: "This is the pivotal moment. Click the 'However' button to see the perspective shift. Hover over cards for details.",
+                gap_desc: "This is the pivotal moment. Click 'However' to see the shift.",
                 pivot_good: "Mamba is Great", pivot_bad: "However...",
-                pivot_res_title: "\"Hardware research is limited\"", pivot_res_desc: "Through 'However,' the author shifts focus to specific challenges.",
+                pivot_res_title: "\"Hardware research is limited\"", pivot_res_desc: "Shifting focus to specific challenges.",
                 c1_title: "Incompatibility", c1_sub: "Element-wise ops vs. Tensor Core",
-                c1_conflict: "Tensor Cores are built for reduction. Mamba's element-wise ops don't need reduction, leading to massive inefficiency.",
+                c1_conflict: "Inefficiency due to hardware mismatch.",
                 c1_strat: "Strategy: Using numbers to prove inefficiency.",
                 c2_title: "Area Overhead", c2_sub: "Wasted silicon area",
-                c2_conflict: "Specialized units for nonlinear functions (like Exp) occupy too much space but are not always used.",
-                c2_strat: "Strategy: Criticizing resource waste (Overhead).",
+                c2_conflict: "Resource waste on nonlinear functions.",
+                c2_strat: "Strategy: Criticizing resource waste.",
                 c3_title: "Memory Bottleneck", c3_sub: "Existing methods fail",
-                c3_conflict: "High memory access but limited data reuse makes traditional 'Tiling' optimization impossible.",
+                c3_conflict: "Traditional tiling is impossible.",
                 c3_strat: "Strategy: Using the strong word 'Useless'.",
-                evidence_label: "Evidence", hover_expand: "Hover to Expand",
-                strat_sum_title: "Strategy Summary: Move 3",
-                strat_sum_desc: "The author goes beyond simply stating problems. They use <strong class='text-red-400'>Negative Evaluation</strong> words like \"Incompatibility\" and \"Useless\" to intensify the tone. In academic writing, this is called <strong class='text-amber-400'>Problematization</strong>, aiming to create an indispensable need for the proposed solution.",
-                footer: "Scientific Writing Final Project Analysis"
+                footer: "Scientific Writing Final Project Analysis",
+                thank_you_title: "Thank You!",
+                thank_you_desc: "Thank you for your attention. Feel free to ask any questions!",
+                celebrate_btn: "Celebrate!"
             },
             zh: {
                 nav_intro: "簡介", nav_structure: "結構分析", nav_gap: "定義缺口",
@@ -470,45 +453,45 @@
                 pyr_1: "1. 建立重要性", pyr_2: "2. 過往研究與比較", pyr_3: "3. 定義缺口 (Gap)",
                 pyr_4: "4. 提出解法 (Work)", pyr_5: "5. 貢獻與結果",
                 gap_subtitle: "深入剖析 Move 3", gap_title: "定義研究缺口：從讚美到批評",
-                gap_desc: "這是整篇文章的轉折樞紐。點擊下方的 'However' 按鈕，體驗作者如何引導讀者的思維轉變。滑鼠懸浮卡片查看細節。",
+                gap_desc: "這是整篇文章的轉折樞紐。點擊 'However' 按鈕體驗思維轉變。",
                 pivot_good: "Mamba 演算法很棒", pivot_bad: "但是 (However)...",
-                pivot_res_title: "\"硬體研究非常有限 (Limited Research)\"", pivot_res_desc: "透過 However，作者成功將焦點轉移至三個具體的工程挑戰。",
-                c1_title: "不相容性", c1_sub: "Element-wise 操作與 Tensor Core 不合",
-                c1_conflict: "Tensor Core 專為 Reduction 設計。Mamba 的逐元素操作不需要 Reduction，導致巨大的效率低落。",
+                pivot_res_title: "\"硬體研究非常有限\"", pivot_res_desc: "透過 However 成功將焦點轉移至具體挑戰。",
+                c1_title: "不相容性", c1_sub: "與 Tensor Core 不合",
+                c1_conflict: "Tensor Core 專為 Reduction 設計，導致 Mamba 效率低落。",
                 c1_strat: "寫作策略：用具體數字證明現有架構的無能。",
                 c2_title: "面積開銷", c2_sub: "非線性單元浪費資源",
-                c2_conflict: "專用的非線性運算單元（如 Exp）佔用太多空間，但卻不常被使用。",
-                c2_strat: "寫作策略：批評資源浪費 (Overhead) 以合理化新設計。",
+                c2_conflict: "專用的 Exp 單元佔用太多空間，卻不常使用。",
+                c2_strat: "寫作策略：批評資源浪費以合理化新設計。",
                 c3_title: "記憶體瓶頸", c3_sub: "現有方法無效",
-                c3_conflict: "記憶體存取量大，但數據重複使用率低，使得傳統的 'Tiling' 優化技術完全失效。",
-                c3_strat: "寫作策略：使用 \"Useless\" 強烈字眼，斷絕使用舊方法的可能性。",
-                evidence_label: "原文證據", hover_expand: "懸浮展開",
-                strat_sum_title: "Move 3 寫作策略總結",
-                strat_sum_desc: "作者不只陳述問題，而是使用 <strong class='text-red-400'>負面評價詞 (Negative Evaluation)</strong> 如 \"Incompatibility\" 和 \"Useless\" 來強化語氣。這在學術寫作中稱為 <strong class='text-amber-400'>問題化 (Problematization)</strong>，目的是為了替接下來提出的解決方案創造不可或缺的需求。",
-                footer: "科技論文寫作分析報告"
+                c3_conflict: "數據重複使用率低，傳統優化技術完全失效。",
+                c3_strat: "寫作策略：使用 'Useless' 強烈字眼。",
+                footer: "科技論文寫作分析報告",
+                thank_you_title: "感謝聆聽！",
+                thank_you_desc: "報告結束，歡迎提出任何問題與指導。",
+                celebrate_btn: "慶祝！"
             }
         };
 
         const layerData = {
             1: {
-                en: { title: "Establish Importance (Move 1)", desc: "The authors first establish the dominance of SSM/Mamba in the AI field.", analysis: "Using positive evaluative adjectives like <span class='text-amber-400 font-bold'>remarkable capabilities</span>. This is a Rhetorical Strategy to immediately validate the research topic's value." },
-                zh: { title: "建立重要性 (Move 1)", desc: "作者首先確立 SSM/Mamba 在 AI 領域的統治地位。", analysis: "使用 <span class='text-amber-400 font-bold'>remarkable capabilities</span> (卓越能力) 這類正面的評價形容詞，立即讓讀者認同此研究主題的價值。" }
+                en: { title: "Establish Importance (Move 1)", desc: "The authors establish Mamba's dominance in AI.", analysis: "Using <span class='text-amber-400 font-bold'>remarkable capabilities</span>." },
+                zh: { title: "建立重要性 (Move 1)", desc: "確立 Mamba 在 AI 領域的統治地位。", analysis: "使用 <span class='text-amber-400 font-bold'>remarkable capabilities</span>。" }
             },
             2: {
-                en: { title: "Previous Research (Move 2)", desc: "Establishing a comparison. Acknowledging Transformer's success, then pointing out its flaw.", analysis: "Using the <span class='text-amber-400 font-bold'>Compared with</span> phrase to provide 'Background Facts' (Mamba has higher accuracy), laying the groundwork for hardware optimization." },
-                zh: { title: "過往研究與比較 (Move 2)", desc: "建立對照組。先承認 Transformer 的成功，再指出其缺點。", analysis: "使用 <span class='text-amber-400 font-bold'>Compared with</span> 句型。提供背景事實（Mamba 準確度更高），為後續推銷硬體加速器奠定基礎。" }
+                en: { title: "Previous Research (Move 2)", desc: "Transformer's success vs flaws.", analysis: "Using <span class='text-amber-400 font-bold'>Compared with</span>." },
+                zh: { title: "過往研究 (Move 2)", desc: "承認 Transformer 的成功，指出其缺點。", analysis: "使用 <span class='text-amber-400 font-bold'>Compared with</span>。" }
             },
             3: {
-                en: { title: "The Gap / Problem (Move 3)", desc: "The critical pivot. Pointing out the lack of hardware research (<span class='text-amber-400 font-bold'>limited research</span>).", analysis: "The author doesn't just say 'no one did it,' but lists 3 specific challenges. Using strong negative words like <span class='text-amber-400 font-bold'>useless</span> creates urgency." },
-                zh: { title: "定義缺口 (Move 3)", desc: "這是關鍵轉折。指出硬體研究的空白 (<span class='text-amber-400 font-bold'>limited research</span>)。", analysis: "作者不只說『沒人做』，更具體列出三大挑戰。使用強烈負面詞彙如 <span class='text-amber-400 font-bold'>useless</span> (無效)，營造出『非解決不可』的迫切感。" }
+                en: { title: "The Gap / Problem (Move 3)", desc: "Point out hardware research gaps.", analysis: "Using strong word <span class='text-amber-400 font-bold'>useless</span>." },
+                zh: { title: "定義缺口 (Move 3)", desc: "指出硬體研究的空白。", analysis: "使用強烈詞彙如 <span class='text-amber-400 font-bold'>useless</span>。" }
             },
             4: {
-                en: { title: "The Present Work (Move 4)", desc: "Formally introducing MARCA. Using <span class='text-amber-400 font-bold'>In response to</span> links solution to challenges.", analysis: "Using the standard verb <span class='text-amber-400 font-bold'>propose</span>. This part is symmetrical: for every problem in Move 3, there is a corresponding technical strategy." },
-                zh: { title: "提出解法 (Move 4)", desc: "正式介紹 MARCA。使用 <span class='text-amber-400 font-bold'>In response to</span> 將解法直接連結到前述挑戰。", analysis: "使用標準動詞 <span class='text-amber-400 font-bold'>propose</span>。這部分的結構是對稱的：Move 3 有幾個問題，這裡就有幾個對應的技術策略。" }
+                en: { title: "The Present Work (Move 4)", desc: "Introducing MARCA.", analysis: "Using <span class='text-amber-400 font-bold'>propose</span>." },
+                zh: { title: "提出解法 (Move 4)", desc: "正式介紹 MARCA 加速器。", analysis: "使用標準動詞 <span class='text-amber-400 font-bold'>propose</span>。" }
             },
             5: {
-                en: { title: "Contributions (Move 5)", desc: "Listing contributions and previewing experimental results.", analysis: "Dropping shocking data directly: <span class='text-amber-400 font-bold'>463.22x speedup</span>. This is a powerful Hook, telling the reader this is a major leap." },
-                zh: { title: "貢獻與結果 (Move 5)", desc: "以條列式呈現具體貢獻，並預告實驗結果。", analysis: "直接拋出震撼數據：<span class='text-amber-400 font-bold'>463.22x speedup</span>。這是一個強力的 Hook，告訴讀者這篇論文是巨大的躍進。" }
+                en: { title: "Contributions (Move 5)", desc: "Experimental results preview.", analysis: "Data hook: <span class='text-amber-400 font-bold'>463.22x speedup</span>." },
+                zh: { title: "貢獻與結果 (Move 5)", desc: "列出具體貢獻與實驗數據。", analysis: "數據勾引：<span class='text-amber-400 font-bold'>463.22x 提速</span>。" }
             }
         };
 
@@ -531,9 +514,11 @@
         function updateLayer(id) {
             activeLayerId = id;
             document.querySelectorAll('.paper-section').forEach(el => el.classList.remove('active'));
-            document.getElementById(`text-${id}`).classList.add('active');
+            if(document.getElementById(`text-${id}`)) document.getElementById(`text-${id}`).classList.add('active');
+            
             document.querySelectorAll('.pyramid-layer').forEach(el => el.classList.remove('active'));
-            document.getElementById(`level-${id}`).classList.add('active');
+            if(document.getElementById(`level-${id}`)) document.getElementById(`level-${id}`).classList.add('active');
+            
             const panel = document.getElementById('analysis-card');
             panel.style.opacity = 0;
             setTimeout(() => {
@@ -565,8 +550,86 @@
             }
         }
 
+        // --- Fireworks Logic ---
+        const canvas = document.getElementById('fireworks-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+            constructor(x, y, color) {
+                this.x = x;
+                this.y = y;
+                this.color = color;
+                this.radius = Math.random() * 2 + 1;
+                this.velocity = {
+                    x: (Math.random() - 0.5) * 12,
+                    y: (Math.random() - 0.5) * 12
+                };
+                this.alpha = 1;
+                this.friction = 0.96;
+                this.gravity = 0.15;
+            }
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.alpha;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+                ctx.restore();
+            }
+            update() {
+                this.velocity.x *= this.friction;
+                this.velocity.y *= this.friction;
+                this.velocity.y += this.gravity;
+                this.x += this.velocity.x;
+                this.y += this.velocity.y;
+                this.alpha -= 0.01;
+            }
+        }
+
+        function createExplosion(x, y) {
+            const particleCount = 60;
+            const colors = ['#3b82f6', '#f59e0b', '#ef4444', '#10b981', '#ffffff', '#a855f7'];
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            for (let i = 0; i < particleCount; i++) {
+                particles.push(new Particle(x, y, color));
+            }
+        }
+
+        function animateFireworks() {
+            requestAnimationFrame(animateFireworks);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach((p, i) => {
+                if (p.alpha <= 0) {
+                    particles.splice(i, 1);
+                } else {
+                    p.update();
+                    p.draw();
+                }
+            });
+        }
+
+        function launchFireworks() {
+            const iterations = 8;
+            for (let i = 0; i < iterations; i++) {
+                setTimeout(() => {
+                    const x = Math.random() * canvas.width;
+                    const y = Math.random() * canvas.height * 0.6;
+                    createExplosion(x, y);
+                }, i * 250);
+            }
+        }
+
+        animateFireworks();
         updateLayer(1);
     </script>
 </body>
-
 </html>
